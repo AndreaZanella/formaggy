@@ -19,7 +19,7 @@ $data = json_decode(file_get_contents("php://input"));
 
 if (empty($data->id_formaggyo)) {
     http_response_code(400);
-    echo json_encode(["message" => "Fill every field"]);
+    echo json_encode(["message" => "Compila tutti i campi"]);
     die();
 }
 
@@ -34,22 +34,4 @@ else
     http_response_code(400);
     echo json_encode(["message" => "Problemi con l'eliminazione del formaggyo"]);
 }
-/*    "name":"prova",
-    "description":"prova",
-    "price_kg":145.21,
-    "id_category":1,
-    "id_certification":1,
-    "color":"prova",
-    "smell":"prova",
-    "taste" :"prova",
-    "expiry_date":"2023-12-2 15:20:03",
-    "kcal":1,
-    "fats":1,
-    "satured_fats":1,
-    "carbohydrates":1,
-    "sugars":1,
-    "proteins":1,
-    "fibers":1,
-    "salts":1,
-    "id_ingredient":[1,2,3,4],
-    "id_size":2*/ 
+?>
