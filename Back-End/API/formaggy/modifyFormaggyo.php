@@ -19,7 +19,7 @@ $data = json_decode(file_get_contents("php://input"));
 
 if (empty($data->id_formaggyo)||empty($data->name)||empty($data->description)||empty($data->price_kg)||empty($data->id_category)||empty($data->id_certification)||empty($data->color)||empty($data->smell)||empty($data->taste)||empty($data->kcal)||empty($data->fats)||empty($data->satured_fats)||empty($data->carbohydrates)||empty($data->sugars)||empty($data->proteins)||empty($data->fibers)||empty($data->salts)) {
     http_response_code(400);
-    echo json_encode(["message" => "Fill every field"]);
+    echo json_encode(["message" => "Compila tutti i campi"]);
     die();
 }
 
@@ -35,3 +35,4 @@ else
     http_response_code(400);
     echo json_encode(["message" => "Problemi con la modifica del formaggyo"]);
 }
+?>
