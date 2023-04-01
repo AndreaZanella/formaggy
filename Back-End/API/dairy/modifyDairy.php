@@ -19,7 +19,7 @@ $data = json_decode(file_get_contents("php://input"));
 
 if (empty($data->id_dairy) || empty($data->address)||empty($data->telephon_number) || empty($data->email)|| empty($data->website)|| empty($data->name)) {
     http_response_code(400);
-    echo json_encode(["message" => "Fill every field"]);
+    echo json_encode(["message" => "Compila tutti i campi"]);
     die();
 }
 
@@ -34,3 +34,4 @@ else
     http_response_code(400);
     echo json_encode(["message" => "Problemi con il cambiamento del dairy"]);
 }
+?>
