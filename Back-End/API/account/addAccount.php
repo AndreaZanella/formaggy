@@ -18,7 +18,7 @@ $data = json_decode(file_get_contents("php://input"));
 
 if (empty($data->email) || empty($data->username)||empty($data->secret) || empty($data->permits)) {
     http_response_code(400);
-    echo json_encode(["message" => "Fill every field"]);
+    echo json_encode(["message" => "Compila tutti i campi"]);
     die();
 }
 
@@ -35,3 +35,4 @@ else
     http_response_code(200);
     echo json_encode($id);
 }
+?>
