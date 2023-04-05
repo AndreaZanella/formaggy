@@ -43,7 +43,7 @@ class Warehouse
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
-   public function getWarehouseFormaggy($id) //Ritorna tutti i magazzini.
+   public function getWarehouseFormaggy($id) //Ritorna tutti i formaggi dentro un magazzino.
     {
         $query = "SELECT f.id, f.name, fw.weight 
                     from warehouse w 
