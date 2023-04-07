@@ -54,7 +54,7 @@ class Account
         $stmt->bindValue(':password', $password, PDO::PARAM_STR);
         $stmt->execute();
 
-        return $stmt->rowCount();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
         public function addAccount($email, $username, $secret, $permits)
 {
