@@ -23,15 +23,13 @@ if (empty($data->email) || empty($data->secret)) {
 }
 
 $account = new account();
+$id = $account->login($data->email, $data->secret);
 
-
-if ($account->login($data->email, $data->secret)!=1) {
+if ($id > 0) {
+    echo json_encode($id);
+} else {
     http_response_code(400);
-    echo json_encode(["message" => "Nessun utente trovato con le credenziali inserite"]);
+    echo json_encode(["id" => "-1"]);
 }
-else
-{
-    http_response_code(200);
-    echo json_encode(["message" => "Utente loggato con successo"]);
-}
+
 ?>
