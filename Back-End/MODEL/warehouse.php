@@ -58,6 +58,59 @@ class Warehouse
 
         return $stmt->fetchall(PDO::FETCH_ASSOC);
     }
+    
+    public function getFormaggyWarehouse($id_formaggyo)
+    {
+        $query = "SELECT fw.id_warehouse
+        from formaggyo_warehouse fw 
+        where fw.id_formaggyo = :id_formaggyo";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(':id_formaggyo', $id_formaggyo, PDO::PARAM_INT);
+       
+        $stmt->execute();
+
+        $results = $stmt->fetchall(PDO::FETCH_ASSOC);
+        $warehouses = array();
+
+        foreach ($results as $result) {
+            $warehouses[] = intval($result['id_warehouse']);
+        }
+    
+        return $warehouses[0];
+    }
+
+    //peso totale formaggy e controllo con peso utente se va a buon fine richiamo l'update
+    public function modifyFormaggyWeight($id_formaggyo, $id_warehouse, $weight)
+    {
+
+            $sql = "SELECT SUM(fw.weight) AS total_weight
+                    FROM formaggyo_warehouse fw 
+                    WHERE fw.id_formaggyo = :id_formaggyo";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindValue(':id_formaggyo', $id_formaggyo, PDO::PARAM_INT);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $total_weight = $result['total_weight'];
+
+                if ($weight > 0 && $total_weight >= $weight) {
+                
+                    $sqlmodify = "UPDATE formaggyo_warehouse fw 
+                                  SET fw.weight = fw.weight - :weight
+                                  WHERE fw.id_formaggyo = :id_formaggyo AND fw.id_warehouse = :id_warehouse";
+    
+                    $stmt = $this->conn->prepare($sqlmodify);
+                    $stmt->bindValue(':weight', $weight, PDO::PARAM_STR);
+                    $stmt->bindValue(':id_formaggyo', $id_formaggyo, PDO::PARAM_INT);
+                    $stmt->bindValue(':id_warehouse', $id_warehouse, PDO::PARAM_INT);
+                    $stmt->execute();
+                    $rowCount = $stmt->rowCount();
+                    return $rowCount;
+                    
+                } else {
+                    return ["message" => "Il peso richiesto è superiore alle quantità disponibili"];
+                }
+    }
         public function addWarehouse($address)
     {
         $sql = "SELECT w.id
