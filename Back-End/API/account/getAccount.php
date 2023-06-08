@@ -1,5 +1,7 @@
 <?php
 
+//API per ottenere attraverso l'id un determinato account
+
 require __DIR__ . '/../../MODEL/account.php';
 
 header("Content-type: application/json; charset=UTF-8");
