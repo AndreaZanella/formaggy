@@ -1,5 +1,7 @@
 <?php
 
+//API per l'eliminazione di un account
+
 spl_autoload_register(function ($class) {
     require __DIR__ . "/../../COMMON/$class.php";
 });
