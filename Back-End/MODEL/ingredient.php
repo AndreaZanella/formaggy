@@ -19,8 +19,9 @@ class Ingredient
 
     public function getArchiveIngredient() //Ritorna tutti gli ingredienti.
     {
-        $query = "SELECT id, name, description
-        from ingredient i";
+        $query = "SELECT id, name, description, image
+        from ingredient i
+        ORDER BY id";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -30,7 +31,7 @@ class Ingredient
     
         public function getIngredient($id) //Ritorna tutti gli ingredienti.
     {
-        $query = "SELECT id, name, description
+        $query = "SELECT id, name, description, image
         from ingredient i
         where id = :id";
 
@@ -40,7 +41,7 @@ class Ingredient
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-        public function addIngredient($name, $description)
+        public function addIngredient($name, $description, $image)
     {
         $sql = "SELECT i.id
         FROM ingredient i
@@ -54,12 +55,13 @@ class Ingredient
 
        if($stmt->rowCount()==0)
        {
-        $sql = "INSERT  into ingredient (name, description)
-        values (:name,:description)";
+        $sql = "INSERT  into ingredient (name, description, image)
+        values (:name,:description,:image)";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(':description', $description, PDO::PARAM_STR);
         $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+        $stmt->bindValue(':image', $image, PDO::PARAM_STR);
         $stmt->execute();
         return ["message" => "Ingrediente creato con successo"];
 
@@ -70,7 +72,7 @@ class Ingredient
     
     }
 
-    public function modifyIngredient($id_ingredient, $name, $description)
+    public function modifyIngredient($id_ingredient, $name, $description, $image)
     {
         $sql="UPDATE ingredient
         SET description = :description
@@ -91,10 +93,18 @@ class Ingredient
         $stmt->bindValue(':id_ingredient', $id_ingredient, PDO::PARAM_INT);
         $stmt->execute();
         $cnt+=$stmt->rowCount();
+        
+        $sql="UPDATE ingredient
+        SET image = :image
+        WHERE id=:id_ingredient";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':image', $image, PDO::PARAM_STR);
+        $stmt->bindValue(':id_ingredient', $id_ingredient, PDO::PARAM_INT);
+        $stmt->execute();
+        $cnt+=$stmt->rowCount();
 
         return $cnt;
-
-        /* fai query che ti ritorna l'ingrediente modificato */
     }
 
     public function deleteIngredient($id_ingredient)
