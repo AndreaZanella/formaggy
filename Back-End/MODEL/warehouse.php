@@ -126,7 +126,7 @@ class Warehouse
         } else
             return 0;
     }
-    public function addFormaggyotWarehouse($id_formaggyo, $id_warehouse, $weight)
+    public function addFormaggyoWarehouse($id_formaggyo, $id_warehouse, $weight)
     {
         if (is_array($id_formaggyo)) {
             $cnt = 0;
@@ -175,5 +175,48 @@ class Warehouse
 
         return $stmt->rowCount();
     }
+    
+    public function deleteFormaggyWarehouse($id_formaggyo,$id_warehouse)
+    {
+
+        if(is_array($id_formaggyo))
+        {
+            $cnt=0;
+            for ($i = 0; $i < count($id_formaggyo); $i++)
+            {
+                $sql = "DELETE from formaggyo_warehouse where id_formaggyo=:id_formaggyo AND id_warehouse =:id_warehouse";
+
+                $stmt = $this->conn->prepare($sql);
+                $stmt->bindValue(':id_formaggyo', $id_formaggyo[$i], PDO::PARAM_INT);
+                $stmt->bindValue(':id_warehouse', $id_warehouse, PDO::PARAM_INT);
+                $stmt->execute();
+                $cnt+=$stmt->rowCount();
+            }
+            return $cnt;
+        } else {
+            $sql = "DELETE from formaggyo_warehouse where id_formaggyo=:id_formaggyo AND id_warehouse =:id_warehouse";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindValue(':id_formaggyo', $id_formaggyo, PDO::PARAM_INT);
+            $stmt->bindValue(':id_warehouse', $id_warehouse, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->rowCount();
+        }
+        
+
+    }
+        public function modifyWeightFormaggyo($id_warehouse,$id_formaggyo,$newWeight){
+        $sql = "UPDATE formaggyo_warehouse 
+        SET weight = :newWeight
+        WHERE id_warehouse=:id_warehouse AND id_formaggyo=:id_formaggyo ";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':newWeight', $newWeight, PDO::PARAM_STR);
+        $stmt->bindValue(':id_warehouse', $id_warehouse, PDO::PARAM_INT);
+        $stmt->bindValue(':id_formaggyo', $id_formaggyo, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        return $stmt->rowCount();
+        }
 }
 ?>
