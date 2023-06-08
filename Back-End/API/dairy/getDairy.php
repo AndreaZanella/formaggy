@@ -1,4 +1,5 @@
 <?php
+//API per ottenere attraverso l'id un fornitore
 
 require __DIR__ . '/../../MODEL/dairy.php';
 
