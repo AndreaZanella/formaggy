@@ -1,5 +1,7 @@
 <?php
 
+//API per la cancellazione di un fornitore
+
 spl_autoload_register(function ($class) {
     require __DIR__ . "/../../COMMON/$class.php";
 });
