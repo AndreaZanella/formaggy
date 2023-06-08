@@ -1,5 +1,7 @@
 <?php
 
+//API per l'aggiunta di un nuovo fornitore
+
 spl_autoload_register(function ($class) {
     require __DIR__ . "/../../COMMON/$class.php";
 });
@@ -16,14 +18,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 $data = json_decode(file_get_contents("php://input"));
 
-if (empty($data->name) || empty($data->address)||empty($data->telephon_number) || empty($data->email)|| empty($data->website)) {
+if (empty($data->name) || empty($data->address)||empty($data->telephon_number) || empty($data->email)|| empty($data->website) || empty($data->image)) {
     http_response_code(400);
     echo json_encode(["message" => "Compila tutti i campi"]);
     die();
 }
 
 $dairy = new dairy();
-$id=$dairy->addDairy($data->name,$data->address,$data->telephon_number,$data->email,$data->website);
+$id=$dairy->addDairy($data->name,$data->address,$data->telephon_number,$data->email,$data->website,$data->image);
 
 if ($dairy===true) {
     http_response_code(400);
