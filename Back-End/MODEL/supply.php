@@ -66,17 +66,6 @@ class Supply
     }
         public function addSupply($id_account,$id_dairy,$id_formaggyo,$total_price,$status,$weight)
     {
-        $sql = "SELECT s.id
-        FROM supply s
-        WHERE s.id_account = :id_account AND s.id_dairy=:id_dairy";
-
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindValue(':id_account', $id_account, PDO::PARAM_INT);
-        $stmt->bindValue(':id_dairy', $id_dairy, PDO::PARAM_INT);
-        $stmt->execute();
-
-        if($stmt->rowCount()==0)
-        {
             $sql = "INSERT into supply (id_account, id_dairy, date_supply, total_price,status)
                 values (:id_account,:id_dairy,now(),:total_price,:status);";
     
@@ -99,11 +88,7 @@ class Supply
             $stmt->bindValue(':weight', $weight, PDO::PARAM_INT);
             
             $stmt->execute();
-            return ["message" => "Supply creato con successo"];
-        } else 
-        {
-            return ["message" => "Supply già esistente"];
-        }    
+            return $stmt->rowCount();
         }
 
     public function deleteSupply($id_supply)
@@ -117,5 +102,18 @@ class Supply
          return $stmt->rowCount();
          
     } 
+    
+     public function modifyOrderStatusSupply($status,$id_supply)
+    {
+        $sql="UPDATE supply
+             SET status = :status
+             WHERE id=:id_supply";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':status', $status , PDO::PARAM_INT);
+        $stmt->bindValue(':id_supply', $id_supply, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->rowCount();
+    }
 }
 ?>
