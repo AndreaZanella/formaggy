@@ -21,8 +21,10 @@ class Dairy
 
     public function getArchiveDairy() //Ritorna tutti i fornitori.
     {
-        $query = "SELECT id, name, address, telephon_number, email, website
-        from dairy d";
+        $query = "SELECT id, name, address, telephon_number, email, website, image
+        from dairy d
+        where id > 0
+        order by id";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -32,7 +34,7 @@ class Dairy
     
     public function getDairy($id)
     {
-        $query = "SELECT id, name, address, telephon_number, email, website
+        $query = "SELECT id, name, address, telephon_number, email, website, image
         FROM dairy
         WHERE id = :id";
 
@@ -42,7 +44,7 @@ class Dairy
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-        public function addDairy($name,$address,$telephon_number,$email,$website)
+        public function addDairy($name,$address,$telephon_number,$email,$website,$image)
     {
         $sql="SELECT d.name, d.address, d.email
         FROM dairy d
@@ -55,8 +57,8 @@ class Dairy
 
         if($stmt->rowCount() == 0)
         {
-            $sql = "INSERT into dairy (name, address, telephon_number, email, website)
-            values(:name,:address,:telephon_number,:email,:website)";
+            $sql = "INSERT into dairy (name, address, telephon_number, email, website, image)
+            values(:name,:address,:telephon_number,:email,:website,:image)";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(':name', $name, PDO::PARAM_STR);
@@ -64,6 +66,7 @@ class Dairy
         $stmt->bindValue(':telephon_number', $telephon_number, PDO::PARAM_STR);
         $stmt->bindValue(':email', $email, PDO::PARAM_STR);
         $stmt->bindValue(':website', $website, PDO::PARAM_STR);
+        $stmt->bindValue(':image', $image, PDO::PARAM_STR);
         $stmt->execute();
 
         return ["message" => "Dairy creato con successo"];
@@ -74,7 +77,7 @@ class Dairy
 
     }
 
-    public function modifyDairy($id_dairy,$name,$address,$telephon_number,$email,$website)
+    public function modifyDairy($id_dairy,$name,$address,$telephon_number,$email,$website,$image)
     {
         $sql="UPDATE dairy
               SET name = :name
@@ -133,6 +136,17 @@ class Dairy
 
         $stmt->execute();
         $cnt+=$stmt->rowCount();
+        
+        $sql="UPDATE dairy
+        SET image = :image
+        where id=:id_dairy";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':image', $image, PDO::PARAM_STR);
+        $stmt->bindValue(':id_dairy', $id_dairy, PDO::PARAM_INT);
+
+        $stmt->execute();
+        $cnt+=$stmt->rowCount();
 
         return $cnt;
 
@@ -140,7 +154,7 @@ class Dairy
 
     public function deleteDairy($id_dairy)
     {
-        $sql="DELETE FROM supply_formaggyo WHERE id_supply=(
+        /*$sql="UPDATE supply_formaggyo SET id_dairy = -:id_dairy WHERE id_supply=(
         SELECT supply_formaggyo.id_supply
         FROM supply
         INNER JOIN supply_formaggyo ON supply_formaggyo.id_supply =supply.id
@@ -148,15 +162,15 @@ class Dairy
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(':id_dairy', $id_dairy, PDO::PARAM_INT);
 
-        $stmt->execute();
+        $stmt->execute();*/
 
-        $sql="DELETE FROM supply WHERE id_dairy =:id_dairy";
+        $sql="UPDATE supply SET id_dairy = -:id_dairy WHERE id_dairy =:id_dairy";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(':id_dairy', $id_dairy, PDO::PARAM_INT);
 
         $stmt->execute();
 
-        $sql="DELETE FROM dairy WHERE id=:id_dairy";
+        $sql="UPDATE dairy SET id = -:id_dairy WHERE id=:id_dairy";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(':id_dairy', $id_dairy, PDO::PARAM_INT);
 
