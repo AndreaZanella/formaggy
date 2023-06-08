@@ -1,4 +1,7 @@
 <?php
+
+//API per ottenere tutte le certificazioni
+
 require __DIR__ . '/../../MODEL/certification.php';
 
 header("Content-type: application/json; charset=UTF-8");
