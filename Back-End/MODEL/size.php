@@ -1,9 +1,12 @@
 <?php
+// Registra la funzione di caricamento automatico delle classi
 spl_autoload_register(function ($class) {
     require __DIR__ . "/../COMMON/$class.php";
 });
 
+// Imposta la gestione delle eccezioni personalizzata
 set_exception_handler("errorHandler::handleException");
+// Imposta la gestione degli errori personalizzata
 set_error_handler("errorHandler::handleError");
 
 class Size
@@ -11,16 +14,18 @@ class Size
     private PDO $conn;
     private Connect $db;
 
-    public function __construct() //Si connette al DB.
+    public function __construct()
     {
+        // Crea un'istanza di Connect per stabilire la connessione al database
         $this->db = new Connect;
         $this->conn = $this->db->getConnection();
     }
 
-    public function getArchiveSize() //Ritorna tutti le dimensioni.
+    // Ottiene tutte le dimensioni dall'archivio
+    public function getArchiveSize()
     {
         $query = "SELECT id, weight
-        from `size` s";
+        FROM `size` s";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
