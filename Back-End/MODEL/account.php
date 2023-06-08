@@ -45,7 +45,7 @@ class Account
     }
         public function login($email, $password)
     {
-        $sql = "SELECT a.id
+        $sql = "SELECT a.id, a.permits
         FROM account a 
         WHERE a.email =:email and a.secret =:password";
 
@@ -100,7 +100,7 @@ public function modifyPassword($id_account,$new_password)
            WHERE id=:id_account";
     $stmt = $this->conn->prepare($sql);
     $stmt->bindValue(':id_account', $id_account, PDO::PARAM_INT);
-    $stmt->bindValue(':new_password', $new_password, PDO::PARAM_INT);
+    $stmt->bindValue(':new_password', $new_password, PDO::PARAM_STR);
     $stmt->execute();
 
     return $stmt->rowCount();
