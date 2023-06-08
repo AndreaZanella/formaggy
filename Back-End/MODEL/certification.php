@@ -11,21 +11,21 @@ class Certification
     private PDO $conn;
     private Connect $db;
 
-    public function __construct() //Si connette al DB.
+    public function __construct() // Costruttore della classe
     {
-        $this->db = new Connect;
-        $this->conn = $this->db->getConnection();
+        $this->db = new Connect; // Crea un'istanza dell'oggetto Connect
+        $this->conn = $this->db->getConnection(); // Ottiene la connessione al database
     }
 
-    public function getArchiveCertification() //Ritorna tutte le certificazioni.
+    public function getArchiveCertification() // Ottiene tutte le certificazioni dall'archivio
     {
         $query = "SELECT id, acronym, name
-        from certification c";
+                  FROM certification c"; // Query per selezionare le certificazioni
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
+        $stmt = $this->conn->prepare($query); // Prepara la query
+        $stmt->execute(); // Esegue la query
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Restituisce i risultati come un array associativo
     }
 }
 ?>
