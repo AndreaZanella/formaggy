@@ -1,5 +1,7 @@
 <?php
 
+//API per ottenere tutti i fornitori
+
 require __DIR__ . '/../../MODEL/dairy.php';
 
 header("Content-type: application/json; charset=UTF-8");
@@ -20,6 +22,7 @@ for ($i = 0; $i < (count($result)); $i++) {
         "telephon_number" => $result[$i]["telephon_number"],
         "email" => $result[$i]["email"],
         "website" => $result[$i]["website"],
+        "image" => $result[$i]["image"]
     );
     array_push($archiveDairies, $archiveDairy);
 }
