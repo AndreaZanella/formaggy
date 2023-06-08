@@ -8,8 +8,8 @@ set_error_handler("errorHandler::handleError");
 
 class Category
 {
-    private PDO $conn;
     private Connect $db;
+    private PDO $conn;
 
     public function __construct() //Si connette al DB.
     {
