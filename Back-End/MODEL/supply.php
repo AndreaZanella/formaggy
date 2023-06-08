@@ -1,10 +1,12 @@
 <?php
-
+// Registra la funzione di caricamento automatico delle classi
 spl_autoload_register(function ($class) {
     require __DIR__ . "/../COMMON/$class.php";
 });
 
+// Imposta la gestione delle eccezioni personalizzata
 set_exception_handler("errorHandler::handleException");
+// Imposta la gestione degli errori personalizzata
 set_error_handler("errorHandler::handleError");
 
 class Supply
@@ -14,11 +16,13 @@ class Supply
 
     public function __construct()
     {
+        // Crea un'istanza di Connect per stabilire la connessione al database
         $this->db = new Connect;
         $this->conn = $this->db->getConnection();
     }
     
-    public function getArchiveSupply() //Ritorna tutti gli ordini
+    // Ottiene tutti gli ordini dal database
+    public function getArchiveSupply()
     {
         $sql = "SELECT s.id, a.username, d.name as dairy_name, s.date_supply, s.total_price, s.status
         FROM supply s
@@ -33,7 +37,8 @@ class Supply
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getSupply($id) //Ritorna l'ordine richiesto fatto al fornitore ricevendo in input l'id
+    // Ottiene un ordine specifico dal database tramite ID
+    public function getSupply($id)
     {
         $sql = "SELECT s.id, a.username, d.name as dairy_name, s.date_supply, s.total_price, s.status
         FROM supply s
@@ -43,13 +48,13 @@ class Supply
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-
         $stmt->execute();
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
-    public function getSupplyFormaggy($id) //Ritorna i prodotti di un ordine
+    // Ottiene i prodotti di un ordine specifico dal database tramite ID
+    public function getSupplyFormaggy($id)
     {
         $sql = "SELECT f.id, f.name, f.description, sf.weight
         FROM supply s
@@ -59,60 +64,64 @@ class Supply
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-        public function addSupply($id_account,$id_dairy,$id_formaggyo,$total_price,$status,$weight)
-    {
-            $sql = "INSERT into supply (id_account, id_dairy, date_supply, total_price,status)
-                values (:id_account,:id_dairy,now(),:total_price,:status);";
     
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindValue(':id_account', $id_account, PDO::PARAM_INT);
-            $stmt->bindValue(':id_dairy', $id_dairy, PDO::PARAM_INT);
-            $stmt->bindValue(':total_price', $total_price, PDO::PARAM_INT);
-            $stmt->bindValue(':status', $status, PDO::PARAM_INT);
-            $stmt->execute();
+    // Aggiunge un nuovo ordine di fornitura al database
+    public function addSupply($id_account, $id_dairy, $id_formaggyo, $total_price, $status, $weight)
+    {
+        $sql = "INSERT into supply (id_account, id_dairy, date_supply, total_price, status)
+                values (:id_account, :id_dairy, now(), :total_price, :status);";
 
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':id_account', $id_account, PDO::PARAM_INT);
+        $stmt->bindValue(':id_dairy', $id_dairy, PDO::PARAM_INT);
+        $stmt->bindValue(':total_price', $total_price, PDO::PARAM_INT);
+        $stmt->bindValue(':status', $status, PDO::PARAM_INT);
+        $stmt->execute();
 
-        $sql="INSERT into supply_formaggyo (id_supply,id_formaggyo,weight)
+        $sql = "INSERT into supply_formaggyo (id_supply, id_formaggyo, weight)
               values((select s.id
                 from supply s
                 order by s.id desc 
-                limit 1),:id_formaggyo,:weight)";
-
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindValue(':id_formaggyo', $id_formaggyo, PDO::PARAM_INT);
-            $stmt->bindValue(':weight', $weight, PDO::PARAM_INT);
-            
-            $stmt->execute();
-            return $stmt->rowCount();
-        }
-
-    public function deleteSupply($id_supply)
-    {
-        $sql="UPDATE supply
-            set status = 3
-            where id=:id_supply";
-         $stmt = $this->conn->prepare($sql);
-         $stmt->bindValue(':id_supply', $id_supply, PDO::PARAM_INT);         
-         $stmt->execute();
-         return $stmt->rowCount();
-         
-    } 
-    
-     public function modifyOrderStatusSupply($status,$id_supply)
-    {
-        $sql="UPDATE supply
-             SET status = :status
-             WHERE id=:id_supply";
+                limit 1), :id_formaggyo, :weight)";
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->bindValue(':status', $status , PDO::PARAM_INT);
+        $stmt->bindValue(':id_formaggyo', $id_formaggyo, PDO::PARAM_INT);
+        $stmt->bindValue(':weight', $weight, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->rowCount();
+    }
+
+    // Elimina un ordine di fornitura dal database tramite ID
+    public function deleteSupply($id_supply)
+    {
+        $sql = "UPDATE supply
+            set status = 3
+            where id = :id_supply";
+
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(':id_supply', $id_supply, PDO::PARAM_INT);
         $stmt->execute();
+
+        return $stmt->rowCount();
+    } 
+    
+    // Modifica lo stato di un ordine di fornitura nel database tramite ID
+    public function modifyOrderStatusSupply($status, $id_supply)
+    {
+        $sql = "UPDATE supply
+             SET status = :status
+             WHERE id = :id_supply";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':status', $status, PDO::PARAM_INT);
+        $stmt->bindValue(':id_supply', $id_supply, PDO::PARAM_INT);
+        $stmt->execute();
+
         return $stmt->rowCount();
     }
 }
