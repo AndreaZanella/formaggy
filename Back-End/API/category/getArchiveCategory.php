@@ -1,4 +1,7 @@
 <?php
+
+//API per ottenere tutte le categorie
+
 require __DIR__ . '/../../MODEL/category.php';
 
 header("Content-type: application/json; charset=UTF-8");
