@@ -1,5 +1,7 @@
 <?php
 
+//API per l'aggiunta di un nuovo account
+
 spl_autoload_register(function ($class) {
     require __DIR__ . "/../../COMMON/$class.php";
 });
