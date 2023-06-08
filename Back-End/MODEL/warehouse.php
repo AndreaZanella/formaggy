@@ -18,10 +18,14 @@ class Warehouse
         $this->conn = $this->db->getConnection();
     }
     
-   public function getArchiveWarehouse() //Ritorna tutti i magazzini.
+    /**
+     * Ritorna tutti i magazzini presenti nel database.
+     * @return array Array associativo contenente gli id e gli indirizzi dei magazzini.
+     */
+    public function getArchiveWarehouse()
     {
         $query = "SELECT id, address
-        from warehouse w";
+        FROM warehouse w";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -29,11 +33,16 @@ class Warehouse
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-   public function getWarehouse($id) //ritorna il magazzino richiesto ricevendo in input l'id dell'magazzino stesso
+    /**
+     * Ritorna le informazioni di un magazzino specificato tramite ID.
+     * @param int $id L'ID del magazzino.
+     * @return array Array associativo contenente l'ID e l'indirizzo del magazzino.
+     */
+    public function getWarehouse($id)
     {
         $sql = "SELECT id, address
-        from warehouse w
-        where w.id = :id ";
+        FROM warehouse w
+        WHERE w.id = :id ";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
@@ -43,22 +52,33 @@ class Warehouse
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
-   public function getWarehouseFormaggy($id) //Ritorna tutti i formaggi dentro un magazzino.
+    /**
+     * Ritorna i formaggi presenti in un magazzino specificato tramite ID.
+     * @param int $id L'ID del magazzino.
+     * @return array Array associativo contenente l'ID, il nome e il peso dei formaggi presenti nel magazzino.
+     */
+    public function getWarehouseFormaggy($id)
     {
         $query = "SELECT f.id, f.name, fw.weight 
-                    from warehouse w 
-                    inner join formaggyo_warehouse fw on fw.id_warehouse = w.id
-                    inner join formaggyo f on fw.id_formaggyo = f.id 
-                    where w.id = :id";
+        FROM warehouse w 
+        INNER JOIN formaggyo_warehouse fw ON fw.id_warehouse = w.id
+        INNER JOIN formaggyo f ON fw.id_formaggyo = f.id 
+        WHERE w.id = :id";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
        
         $stmt->execute();
 
-        return $stmt->fetchall(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-        public function addWarehouse($address)
+    
+    /**
+     * Aggiunge un nuovo magazzino al database.
+     * @param string $address L'indirizzo del magazzino da aggiungere.
+     * @return array Array contenente un messaggio che indica se il magazzino è stato creato con successo o se esiste già.
+     */
+    public function addWarehouse($address)
     {
         $sql = "SELECT w.id
         FROM warehouse w
@@ -68,8 +88,8 @@ class Warehouse
         $stmt->execute();
 
         if ($stmt->rowCount() == 0) {
-            $sql = "INSERT into warehouse (address)
-            values(:address)";
+            $sql = "INSERT INTO warehouse (address)
+            VALUES (:address)";
 
             $stmt = $this->conn->prepare($sql);
             $stmt->bindValue(':address', $address, PDO::PARAM_STR);
@@ -80,29 +100,13 @@ class Warehouse
         }
     }
 
-    public function addMultipleFormaggyo($id_formaggyo, $id_warehouse, $weight)
-    {
-        $sql = "SELECT fw.id_formaggyo, fw.id_warehouse
-        FROM formaggyo_warehouse fw
-        WHERE fw.id_formaggyo=:id_formaggyo AND fw.id_warehouse=:id_warehouse";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindValue(':id_formaggyo', $id_formaggyo, PDO::PARAM_STR);
-        $stmt->bindValue(':id_warehouse', $id_warehouse, PDO::PARAM_STR);
-        $stmt->execute();
-        if ($stmt->rowCount() == 0) {
-            $sql = "INSERT into formaggyo_warehouse (id_formaggyo, id_warehouse,weight)
-                values(:id_formaggyo,:id_warehouse,:weight)";
-
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindValue(':id_formaggyo', $id_formaggyo, PDO::PARAM_INT);
-            $stmt->bindValue(':id_warehouse', $id_warehouse, PDO::PARAM_INT);
-            $stmt->bindValue(':weight', $weight, PDO::PARAM_INT);
-
-            $stmt->execute();
-            return $stmt->rowCount();
-        } else
-            return 0;
-    }
+    /**
+     * Aggiunge un formaggio specifico a un magazzino specifico nel database.
+     * @param int $id_formaggyo L'ID del formaggio da aggiungere.
+     * @param int $id_warehouse L'ID del magazzino in cui aggiungere il formaggio.
+     * @param int $weight Il peso del formaggio da aggiungere.
+     * @return int Il numero di righe inserite nel database (1 se l'inserimento è riuscito, altrimenti 0).
+     */
     public function addSingleFormaggyo($id_formaggyo, $id_warehouse, $weight)
     {
         $sql = "SELECT fw.id_formaggyo, fw.id_warehouse
@@ -113,8 +117,8 @@ class Warehouse
         $stmt->bindValue(':id_warehouse', $id_warehouse, PDO::PARAM_STR);
         $stmt->execute();
         if ($stmt->rowCount() == 0) {
-            $sql = "INSERT into formaggyo_warehouse (id_formaggyo, id_warehouse,weight)
-                values(:id_formaggyo,:id_warehouse,:weight)";
+            $sql = "INSERT INTO formaggyo_warehouse (id_formaggyo, id_warehouse,weight)
+                VALUES (:id_formaggyo,:id_warehouse,:weight)";
 
             $stmt = $this->conn->prepare($sql);
             $stmt->bindValue(':id_formaggyo', $id_formaggyo, PDO::PARAM_INT);
@@ -126,25 +130,38 @@ class Warehouse
         } else
             return 0;
     }
+    
+    /**
+     * Aggiunge più formaggi a un magazzino specifico nel database.
+     * @param array $id_formaggyo Un array contenente gli ID dei formaggi da aggiungere.
+     * @param int $id_warehouse L'ID del magazzino in cui aggiungere i formaggi.
+     * @param array $weight Un array contenente i pesi dei formaggi corrispondenti.
+     * @return array Array contenente un messaggio che indica se i formaggi sono stati aggiunti con successo o se sono già presenti.
+     */
     public function addFormaggyoWarehouse($id_formaggyo, $id_warehouse, $weight)
     {
         if (is_array($id_formaggyo)) {
             $cnt = 0;
             for ($i = 0; $i < count($id_formaggyo); $i++)
-                $cnt += $this->addMultipleFormaggyo($id_formaggyo[$i], $id_warehouse, $weight[$i]);
+                $cnt += $this->addSingleFormaggyo($id_formaggyo[$i], $id_warehouse, $weight[$i]);
             if ($cnt > 0)
-                return ["message" => "formaggyo nella warehouse aggiunto con successo"];
+                return ["message" => "Formaggi nella warehouse aggiunti con successo"];
             else
-                return ["message" => "tutti i formaggi selezionati sono già presenti nella warehouse"];
+                return ["message" => "Tutti i formaggi selezionati sono già presenti nella warehouse"];
         } else {
             if ($this->addSingleFormaggyo($id_formaggyo, $id_warehouse, $weight) == 1)
-                return ["message" => "formaggyo nella warehouse aggiunto con successo"];
+                return ["message" => "Formaggio nella warehouse aggiunto con successo"];
             else
-                return ["message" => "Formaggyo selezionati sono già presenti nella warehouse"];
+                return ["message" => "Formaggio selezionato già presente nella warehouse"];
         }
     }
 
-
+    /**
+     * Modifica l'indirizzo di un magazzino nel database.
+     * @param int $id_warehouse L'ID del magazzino da modificare.
+     * @param string $newAddressWarehouse Il nuovo indirizzo del magazzino.
+     * @return int Il numero di righe modificate nel database.
+     */
     public function modifyWarehouse($id_warehouse, $newAddressWarehouse)
     {
         $sql = "UPDATE warehouse
@@ -159,15 +176,20 @@ class Warehouse
         return $stmt->rowCount();
     }
 
+    /**
+     * Elimina un magazzino dal database.
+     * @param int $id_warehouse L'ID del magazzino da eliminare.
+     * @return int Il numero di righe eliminate nel database.
+     */
     public function deleteWarehouse($id_warehouse)
     {
-        $sql = "DELETE from formaggyo_warehouse where id_warehouse =:id_warehouse";
+        $sql = "DELETE FROM formaggyo_warehouse WHERE id_warehouse =:id_warehouse";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(':id_warehouse', $id_warehouse, PDO::PARAM_INT);
         $stmt->execute();
 
-        $sql = "DELETE from warehouse  where id =:id_warehouse";
+        $sql = "DELETE FROM warehouse WHERE id =:id_warehouse";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bindValue(':id_warehouse', $id_warehouse, PDO::PARAM_INT);
@@ -175,7 +197,13 @@ class Warehouse
 
         return $stmt->rowCount();
     }
-    
+
+    /**
+     * Elimina un formaggio da un magazzino nel database.
+     * @param int|array $id_formaggyo L'ID o un array di ID dei formaggi da eliminare.
+     * @param int $id_warehouse L'ID del magazzino da cui eliminare i formaggi.
+     * @return int Il numero di righe eliminate nel database.
+     */
     public function deleteFormaggyWarehouse($id_formaggyo,$id_warehouse)
     {
 
@@ -184,7 +212,7 @@ class Warehouse
             $cnt=0;
             for ($i = 0; $i < count($id_formaggyo); $i++)
             {
-                $sql = "DELETE from formaggyo_warehouse where id_formaggyo=:id_formaggyo AND id_warehouse =:id_warehouse";
+                $sql = "DELETE FROM formaggyo_warehouse WHERE id_formaggyo=:id_formaggyo AND id_warehouse =:id_warehouse";
 
                 $stmt = $this->conn->prepare($sql);
                 $stmt->bindValue(':id_formaggyo', $id_formaggyo[$i], PDO::PARAM_INT);
@@ -194,7 +222,7 @@ class Warehouse
             }
             return $cnt;
         } else {
-            $sql = "DELETE from formaggyo_warehouse where id_formaggyo=:id_formaggyo AND id_warehouse =:id_warehouse";
+            $sql = "DELETE FROM formaggyo_warehouse WHERE id_formaggyo=:id_formaggyo AND id_warehouse =:id_warehouse";
 
             $stmt = $this->conn->prepare($sql);
             $stmt->bindValue(':id_formaggyo', $id_formaggyo, PDO::PARAM_INT);
@@ -205,18 +233,28 @@ class Warehouse
         
 
     }
-        public function modifyWeightFormaggyo($id_warehouse,$id_formaggyo,$newWeight){
-        $sql = "UPDATE formaggyo_warehouse 
+
+    /**
+     * Modifica il peso di un formaggio in un magazzino nel database.
+     * @param int $id_formaggyo L'ID del formaggio da modificare.
+     * @param int $id_warehouse L'ID del magazzino in cui modificare il peso.
+     * @param int $newWeight Il nuovo peso del formaggio.
+     * @return int Il numero di righe modificate nel database.
+     */
+    public function modifyFormaggyoWarehouse($id_formaggyo,$id_warehouse,$newWeight)
+    {
+        $sql = "UPDATE formaggyo_warehouse
         SET weight = :newWeight
-        WHERE id_warehouse=:id_warehouse AND id_formaggyo=:id_formaggyo ";
+        WHERE id_formaggyo=:id_formaggyo AND id_warehouse=:id_warehouse";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bindValue(':newWeight', $newWeight, PDO::PARAM_STR);
-        $stmt->bindValue(':id_warehouse', $id_warehouse, PDO::PARAM_INT);
+        $stmt->bindValue(':newWeight', $newWeight, PDO::PARAM_INT);
         $stmt->bindValue(':id_formaggyo', $id_formaggyo, PDO::PARAM_INT);
+        $stmt->bindValue(':id_warehouse', $id_warehouse, PDO::PARAM_INT);
 
         $stmt->execute();
 
         return $stmt->rowCount();
-        }
+    }
 }
+
 ?>
